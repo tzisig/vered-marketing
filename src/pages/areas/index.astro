@@ -1,0 +1,36 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, areas, contact } from '../../config/site.config';
+import { breadcrumbSchema, home } from '../../lib/schema';
+
+const crumbs = [home, { label: 'אזורי פעילות', href: '/areas/' }];
+---
+<BaseLayout title="אזורי פעילות: יועצת שיווק בתל אביב והמרכז" description={`${site.name} מלווה עסקים בתל אביב, רמת גן וגבעתיים, הרצליה, רעננה וכפר סבא ופתח תקווה. מה מיוחד בשיווק בכל אזור.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title="אזורי פעילות" lead={`המשרד ב${contact.office}. הפגישות בעסק שלכם, במשרד או בזום, ולכל אזור יש שוק משלו.`} crumbs={crumbs} image={areas[0].image} imageAlt={areas[0].imageAlt} />
+  <section class="section">
+    <div class="wrap grid">
+      {areas.map((a, i) => (
+        <article class="reveal" style={`--i:${i % 3}`}>
+          <a href={`/areas/${a.slug}/`}>
+            <div class="media"><Picture src={a.image} alt={a.imageAlt} widths={[400, 700]} sizes="(min-width: 900px) 30vw, 100vw" formats={['avif', 'webp']} loading="lazy" /></div>
+            <h2>יועצת שיווק {a.nameIn}</h2>
+          </a>
+          <p class="muted">{a.businessTypes.join(', ')}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: var(--s-7) var(--block-gap); }
+  article { display: grid; gap: var(--s-3); align-content: start; }
+  article a { display: grid; gap: var(--s-4); text-decoration: none; color: var(--c-berry); }
+  .media { aspect-ratio: 16 / 11; }
+  h2 { font-size: var(--t-h3); }
+  article a:hover h2 { text-decoration: underline; text-underline-offset: 0.2em; }
+</style>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { faqs, services, site, images } from '../config/site.config';
+import { breadcrumbSchema, faqSchema, home } from '../lib/schema';
+
+const crumbs = [home, { label: 'שאלות נפוצות', href: '/faq/' }];
+const all = [...faqs, ...services.flatMap((s) => s.faqs)];
+---
+<BaseLayout title="שאלות נפוצות על ייעוץ שיווקי" description={`תשובות לשאלות על עבודה עם ${site.name}: למי זה מתאים, כמה זמן עד תוצאות, תקציבים, חשבונות ונתונים.`} schema={[breadcrumbSchema(crumbs), faqSchema(all)]}>
+  <PageHero title="שאלות נפוצות" lead="לא מצאתם תשובה? שיחת ההיכרות בדיוק בשביל זה." crumbs={crumbs} image={images.segmentation} imageAlt={images.segmentationAlt} />
+  <section class="section--tight">
+    <div class="narrow">
+      <h2 class="mb">כללי</h2>
+      <FaqList items={faqs} />
+      {services.map((s) => (
+        <>
+          <h2 class="mb top"><a href={`/services/${s.slug}/`}>{s.title}</a></h2>
+          <FaqList items={s.faqs} />
+        </>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .mb { margin-bottom: var(--s-4); font-size: var(--t-h3); }
+  .top { margin-top: var(--s-7); }
+  .mb a { color: var(--c-berry); }
+</style>

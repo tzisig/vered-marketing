@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import BudgetCalc from '../components/BudgetCalc.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, budgetTool, images } from '../config/site.config';
+import { breadcrumbSchema, home, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'מחשבון תקציב שיווק', href: '/budget/' }];
+const app = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'מחשבון תקציב שיווק', applicationCategory: 'BusinessApplication', operatingSystem: 'Any', url: abs('/budget/'), offers: { '@type': 'Offer', price: 0, priceCurrency: 'ILS' } };
+---
+<BaseLayout title="מחשבון תקציב שיווק לעסק קטן" description={`מחשבון חינמי של ${site.name}: כמה פניות צריך וכמה תקציב פרסום, לפי ערך הלקוח, שיעור הסגירה והיעד שלכם.`} schema={[breadcrumbSchema(crumbs), app]}>
+  <PageHero title="מחשבון תקציב שיווק" lead={budgetTool.lead} crumbs={crumbs} image={images.segmentation} imageAlt={images.segmentationAlt} />
+  <section class="section--tight"><div class="wrap"><BudgetCalc headingLevel="h2" /></div></section>
+  <section class="section--tight">
+    <div class="narrow prose">
+      <h2>איך המחשבון עובד</h2>
+      <p>מספר הפניות שצריך הוא מספר הלקוחות שרוצים, חלקי שיעור הסגירה. אם מכל 100 פניות 25 הופכות ללקוחות, ורוצים 10 לקוחות, צריך 40 פניות.</p>
+      <p>התקציב הוא מספר הפניות כפול עלות לפנייה בערוץ. הטווחים במחשבון מבוססים על עסקים קטנים במרכז, והם משתנים מאוד בין תחומים. מה שחשוב הוא להשוות את התקציב לרווח מהלקוחות, לא למחיר הפרסום של המתחרים.</p>
+    </div>
+  </section>
+  <CtaBand title="רוצים לבדוק את המספרים יחד?" />
+</BaseLayout>

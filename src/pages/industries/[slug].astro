@@ -1,0 +1,76 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ServiceBlocks from '../../components/ServiceBlocks.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { industries, serviceBySlug, caseBySlug, type Industry, type Service } from '../../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return industries.map((industry) => ({ params: { slug: industry.slug }, props: { industry } }));
+}
+interface Props { industry: Industry }
+const { industry: ind } = Astro.props;
+const svc = ind.services.map(serviceBySlug).filter((x): x is Service => Boolean(x));
+const study = ind.caseSlug ? caseBySlug(ind.caseSlug) : undefined;
+const others = industries.filter((x) => x.slug !== ind.slug);
+const crumbs = [home, { label: 'תחומים', href: '/industries/' }, { label: ind.navTitle, href: `/industries/${ind.slug}/` }];
+const pageSchema = { '@context': 'https://schema.org', '@type': 'Service', name: ind.title, url: abs(`/industries/${ind.slug}/`), provider: businessRef, audience: { '@type': 'BusinessAudience', name: ind.navTitle } };
+---
+<BaseLayout title={ind.metaTitle} description={ind.metaDescription} schema={[breadcrumbSchema(crumbs), pageSchema]} ogImage={ind.image}>
+  <PageHero title={ind.title} lead={ind.intro} crumbs={crumbs} image={ind.image} imageAlt={ind.imageAlt} />
+
+  <section class="section--tight" aria-labelledby="ch-title">
+    <div class="wrap">
+      <h2 id="ch-title" class="mb">האתגרים שחוזרים בתחום</h2>
+      <ul class="challenges">
+        {ind.challenges.map((c, i) => (
+          <li class={`block block--${['white', 'sun', 'white'][i % 3]} reveal`} style={`--i:${i}`}>
+            <h3>{c.title}</h3>
+            <p>{c.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap two">
+      <div class="block block--berry shape-circle on-dark works">
+        <h2 class="mb">מה עובד בתחום</h2>
+        <ul class="dots">{ind.whatWorks.map((w) => <li>{w}</li>)}</ul>
+      </div>
+      {study && <CaseCard study={study} />}
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="svc-title">
+    <div class="wrap">
+      <h2 id="svc-title" class="mb">השירותים שמתאימים ל{ind.navTitle}</h2>
+      <ServiceBlocks list={svc} />
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="o-title">
+    <div class="wrap">
+      <h2 id="o-title" class="mb">תחומים נוספים</h2>
+      <ul class="others">{others.map((o) => <li><a href={`/industries/${o.slug}/`}>{o.navTitle}</a></li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand title={`שיווק ל${ind.navTitle}: בואו נדבר`} />
+</BaseLayout>
+
+<style>
+  .mb { margin-bottom: var(--s-5); }
+  .challenges { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--block-gap); }
+  .challenges li { display: grid; gap: var(--s-2); align-content: start; }
+  .challenges .block--white p { color: var(--c-muted); }
+  .two { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--block-gap); align-items: stretch; }
+  .works > * { position: relative; z-index: 1; }
+  .others { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .others a { display: inline-flex; align-items: center; min-height: 52px; padding: 0 var(--s-5); border-radius: 999px; background: var(--c-card); border: 2px solid var(--c-blush); color: var(--c-berry); text-decoration: none; font-family: var(--font-head); font-weight: 600; }
+  .others a:hover { border-color: var(--c-pink); }
+  @media (max-width: 900px) { .challenges, .two { grid-template-columns: 1fr; } }
+</style>

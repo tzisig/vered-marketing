@@ -1,0 +1,17 @@
+---
+// Sticky contact bar on mobile: book a call, or WhatsApp.
+import Icon from './Icon.astro';
+import { whatsappUrl } from '../config/site.config';
+---
+<div class="mobile-bar" role="region" aria-label="יצירת קשר מהירה">
+  <a class="mb-main" href="/contact/"><Icon name="calendar" size={22} /><strong>שיחת היכרות חינם</strong></a>
+  <a class="mb-wa" href={whatsappUrl()} target="_blank" rel="noopener" aria-label="וואטסאפ (נפתח בחלון חדש)"><Icon name="whatsapp" size={22} /><strong>וואטסאפ</strong></a>
+</div>
+
+<style>
+  .mobile-bar { position: fixed; inset-inline: 0; bottom: 0; z-index: 80; display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); background: var(--c-berry); }
+  .mobile-bar a { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; border-radius: 999px; text-decoration: none; color: #fff; font-family: var(--font-head); }
+  .mb-main { background: var(--c-pink-deep); }
+  .mb-wa { background: var(--c-whatsapp); }
+  @media (min-width: 900px) { .mobile-bar { display: none; } }
+</style>

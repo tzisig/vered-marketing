@@ -1,0 +1,40 @@
+---
+// Services as colored blocks: one block color per service tone, a bento rhythm of wide and narrow.
+import Icon from './Icon.astro';
+import type { Service } from '../config/site.config';
+interface Props { list: Service[]; headingLevel?: 'h2' | 'h3' }
+const { list, headingLevel = 'h3' } = Astro.props;
+const H = headingLevel;
+---
+<ul class="svc">
+  {list.map((s, i) => (
+    <li class:list={['reveal', `span-${[2, 1, 1, 2, 1, 1][i % 6]}`]} style={`--i:${i % 3}`}>
+      <a class:list={['block', `block--${s.tone}`, 'shape-quarter', `tone-${s.tone}`]} href={`/services/${s.slug}/`}>
+        <span class="ico"><Icon name={s.icon} size={28} /></span>
+        <H class="title">{s.title}</H>
+        <span class="short">{s.short}</span>
+        <span class="price">{s.price}</span>
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .svc { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--block-gap); }
+  .span-2 { grid-column: span 2; }
+  .block { display: grid; align-content: start; gap: var(--s-3); height: 100%; min-height: 250px; text-decoration: none; transition: transform 220ms var(--ease); }
+  .block:hover { transform: translateY(-4px); }
+  .ico { width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; background: rgb(255 255 255 / 0.2); }
+  .tone-sun .ico { background: rgb(131 24 67 / 0.1); }
+  .title { font-size: 1.5rem; }
+  /* White small text is below AA on pink and cyan, so those blocks keep their small text on a white chip */
+  .short { position: relative; z-index: 1; font-size: 1rem; line-height: 1.55; }
+  .tone-pink .short, .tone-cyan .short { background: rgb(255 255 255 / 0.94); color: var(--c-berry); padding: 8px 12px; border-radius: 12px; }
+  .tone-berry .short { color: var(--c-blush); }
+  /* 19px bold counts as large text, so white price text stays AA on pink and cyan */
+  .price { position: relative; z-index: 1; justify-self: start; margin-top: auto; font-family: var(--font-head); font-weight: 700; font-size: 1.1875rem; }
+  .block:hover .title { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.2em; }
+  @media (prefers-reduced-motion: reduce) { .block:hover { transform: none; } }
+  @media (max-width: 1000px) { .svc { grid-template-columns: 1fr 1fr; } .span-2 { grid-column: span 2; } }
+  @media (max-width: 600px) { .svc { grid-template-columns: 1fr; } .span-2 { grid-column: auto; } .block { min-height: 0; } }
+</style>

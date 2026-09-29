@@ -1,0 +1,96 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import Icon from '../../components/Icon.astro';
+import FaqList from '../../components/FaqList.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { services, cases, areas, serviceBySlug, type Service } from '../../config/site.config';
+import { breadcrumbSchema, faqSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return services.map((service) => ({ params: { slug: service.slug }, props: { service } }));
+}
+interface Props { service: Service }
+const { service: s } = Astro.props;
+const related = s.related.map(serviceBySlug).filter((x): x is Service => Boolean(x));
+const svcCases = cases.filter((c) => c.services.includes(s.slug));
+const crumbs = [home, { label: 'שירותים', href: '/services/' }, { label: s.navTitle, href: `/services/${s.slug}/` }];
+const serviceSchema = { '@context': 'https://schema.org', '@type': 'Service', name: s.title, serviceType: s.navTitle, description: s.metaDescription, url: abs(`/services/${s.slug}/`), provider: businessRef, areaServed: areas.map((a) => ({ '@type': 'Place', name: a.name })) };
+---
+<BaseLayout title={s.metaTitle} description={s.metaDescription} schema={[breadcrumbSchema(crumbs), serviceSchema, faqSchema(s.faqs)]} ogImage={s.image}>
+  <PageHero title={s.title} lead={s.intro} crumbs={crumbs} image={s.image} imageAlt={s.imageAlt}>
+    <div class="facts">
+      <p><Icon name="briefcase" size={18} /> {s.price}</p>
+      <p><Icon name="calendar" size={18} /> {s.duration}</p>
+    </div>
+  </PageHero>
+
+  <section class="section--tight">
+    <div class="wrap two">
+      <div class="block block--white">
+        <h2 class="mb">למי זה מתאים</h2>
+        <ul class="dots">{s.forWho.map((w) => <li>{w}</li>)}</ul>
+      </div>
+      <div class="block block--berry shape-quarter on-dark">
+        <h2 class="mb">מה מקבלים</h2>
+        <ul class="dots">{s.deliverables.map((d) => <li>{d}</li>)}</ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="how-title">
+    <div class="wrap">
+      <h2 id="how-title" class="mb">איך זה עובד</h2>
+      <ol class="steps">
+        {s.steps.map((st, i) => (
+          <li class="block block--white reveal" style={`--i:${i}`}>
+            <span class="num">{i + 1}</span>
+            <h3>{st.title}</h3>
+            <p class="muted">{st.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {svcCases.length > 0 && (
+    <section class="section--tight" aria-labelledby="c-title">
+      <div class="wrap">
+        <h2 id="c-title" class="mb">מקרי בוחן עם {s.navTitle}</h2>
+        <div class="cases">{svcCases.map((c) => <CaseCard study={c} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section--tight" aria-labelledby="faq-title">
+    <div class="narrow">
+      <h2 id="faq-title" class="mb">שאלות על {s.navTitle}</h2>
+      <FaqList items={s.faqs} />
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="rel-title">
+    <div class="wrap">
+      <h2 id="rel-title" class="mb">משתלב טוב עם</h2>
+      <ul class="rel">{related.map((r) => <li><a class={`block block--${r.tone} chip`} href={`/services/${r.slug}/`}><Icon name={r.icon} /> {r.title}</a></li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand title={`רוצים לדבר על ${s.navTitle}?`} />
+</BaseLayout>
+
+<style>
+  .facts { display: flex; flex-wrap: wrap; gap: var(--s-2) var(--s-5); position: relative; z-index: 1; }
+  .facts p { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--c-sun); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--block-gap); }
+  .two > .block > * { position: relative; z-index: 1; }
+  .mb { margin-bottom: var(--s-5); }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--block-gap); }
+  .steps li { display: grid; align-content: start; gap: var(--s-2); }
+  .num { font-family: var(--font-head); font-weight: 700; font-size: 2.25rem; line-height: 1; color: var(--c-pink-deep); }
+  .cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 360px)); gap: var(--block-gap); }
+  .rel { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: var(--s-4) var(--s-5); border-radius: 999px; font-family: var(--font-head); font-weight: 700; font-size: 1.1875rem; text-decoration: none; }
+  @media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, cases, owner } from '../../config/site.config';
+import { breadcrumbSchema, home } from '../../lib/schema';
+
+const crumbs = [home, { label: 'מקרי בוחן', href: '/cases/' }];
+---
+<BaseLayout title="מקרי בוחן: תוצאות של ליווי שיווקי" description={`מקרי בוחן של ${site.name}: קליניקה, משרד עורכי דין, רשת בתי קפה וחברת תוכנה. מה עשינו ומה השתנה, במספרים.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title="מקרי בוחן" lead="ארבעה עסקים מארבעה תחומים. בכל אחד: מה היה, מה עשינו, ומה השתנה במספרים (כל הנתונים באתר הדגמה זה בדויים)." crumbs={crumbs} image={owner.deskImage} imageAlt={owner.deskImageAlt} />
+  <section class="section">
+    <div class="wrap grid">{cases.map((c, i) => <div class="reveal" style={`--i:${i % 2}`}><CaseCard study={c} headingLevel="h2" /></div>)}</div>
+  </section>
+  <CtaBand title="רוצים שהעסק שלכם יהיה מקרה הבוחן הבא?" />
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--block-gap); }
+  @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } }
+</style>

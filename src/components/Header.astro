@@ -1,0 +1,62 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav, contact } from '../config/site.config';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+<header class="site-header" data-header>
+  <div class="wrap bar">
+    <Logo />
+    <nav class="nav" aria-label="ניווט ראשי">
+      <ul>
+        {nav.filter((n) => n.href !== '/contact/').map((n) => (
+          <li><a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>{n.label}</a></li>
+        ))}
+      </ul>
+    </nav>
+    <div class="actions">
+      <a class="btn btn--primary cta" href="/contact/"><Icon name="calendar" size={20} /><span class="long">{contact.ctaLabel}</span><span class="short">שיחת היכרות</span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" data-menu-toggle>
+        <span class="visually-hidden" data-menu-label>פתיחת תפריט</span>
+        <Icon name="menu" size={26} />
+      </button>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="ניווט ראשי" hidden data-mobile-nav>
+    <ul class="wrap">
+      <li><a href="/" aria-current={path === '/' ? 'page' : undefined}>דף הבית</a></li>
+      {nav.map((n) => <li><a href={n.href} aria-current={isCurrent(n.href) ? 'page' : undefined}>{n.label}</a></li>)}
+      <li><a href="/checkup/">בדיקת בריאות שיווקית</a></li>
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .site-header { position: sticky; top: 0; z-index: 90; background: rgb(253 242 248 / 0.94); backdrop-filter: blur(10px); border-bottom: 2px solid var(--c-blush); }
+  .bar { display: flex; align-items: center; gap: var(--s-5); min-height: 78px; }
+  .nav { margin-inline-start: auto; }
+  .nav ul { list-style: none; display: flex; gap: 2px; }
+  .nav a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 12px; border-radius: 999px; color: var(--c-berry); text-decoration: none; font-family: var(--font-head); font-weight: 550; font-size: 1.0625rem; }
+  .nav a:hover { background: var(--c-blush); }
+  .nav a[aria-current='page'] { background: var(--c-berry); color: #fff; }
+  .actions { display: flex; align-items: center; gap: var(--s-3); }
+  .cta { min-height: 48px; padding-inline: var(--s-5); }
+  .short { display: none; }
+  .menu-toggle { display: none; width: 48px; height: 48px; align-items: center; justify-content: center; border: 2px solid var(--c-blush); border-radius: 50%; background: #fff; color: var(--c-berry); cursor: pointer; }
+  .mobile-nav { border-top: 2px solid var(--c-blush); padding-block: var(--s-3) var(--s-5); }
+  .mobile-nav ul { list-style: none; display: grid; }
+  .mobile-nav a { display: flex; align-items: center; min-height: 52px; color: var(--c-berry); text-decoration: none; font-family: var(--font-head); font-weight: 600; font-size: 1.25rem; border-bottom: 1px solid var(--c-blush); }
+  .mobile-nav a[aria-current='page'] { color: var(--c-pink-deep); }
+  @media (max-width: 1120px) {
+    .nav { display: none; }
+    .actions { margin-inline-start: auto; }
+    .menu-toggle { display: inline-flex; }
+  }
+  @media (max-width: 560px) {
+    .long { display: none; }
+    .short { display: inline; }
+    .cta { padding-inline: var(--s-4); }
+  }
+</style>

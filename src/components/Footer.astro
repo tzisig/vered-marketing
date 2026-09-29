@@ -1,0 +1,59 @@
+---
+import Logo from './Logo.astro';
+import { site, contact, services, industries, areas, nav, legalNav, legal, analytics, telUrl, whatsappUrl } from '../config/site.config';
+const year = new Date().getFullYear();
+---
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="block block--berry shape-quarter cols on-dark">
+      <div class="brand">
+        <div class="logo-wrap"><Logo /></div>
+        <p>{site.tagline}. {contact.responsePromise}.</p>
+        <p><a href={telUrl} class="ltr phone">{contact.phone}</a></p>
+        <p><a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+        <p><a href={whatsappUrl()} target="_blank" rel="noopener">וואטסאפ (נפתח בחלון חדש)</a></p>
+      </div>
+      <div>
+        <h2 class="col-title">שירותים</h2>
+        <ul>{services.map((s) => <li><a href={`/services/${s.slug}/`}>{s.navTitle}</a></li>)}</ul>
+      </div>
+      <div>
+        <h2 class="col-title">תחומים ואזורים</h2>
+        <ul>
+          {industries.map((i) => <li><a href={`/industries/${i.slug}/`}>{i.navTitle}</a></li>)}
+          {areas.map((a) => <li><a href={`/areas/${a.slug}/`}>יועצת שיווק {a.nameIn}</a></li>)}
+        </ul>
+      </div>
+      <div>
+        <h2 class="col-title">עוד</h2>
+        <ul>
+          {nav.filter((n) => n.href !== '/services/').map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+          {legalNav.map((n) => <li><a href={n.href}>{n.label}</a></li>)}
+        </ul>
+      </div>
+    </div>
+    <div class="bottom">
+      <p>&copy; {year} {legal.businessName}. עוסק מורשה <span class="ltr">{legal.businessId}</span>.</p>
+      {analytics.ga4 && <p><button type="button" class="linklike" data-consent-open>הגדרות עוגיות</button></p>}
+    </div>
+    {site.isDemo && <p class="demo">{site.demoNote}</p>}
+  </div>
+</footer>
+
+<style>
+  .site-footer { padding-block: var(--s-8) var(--s-5); }
+  .cols { display: grid; grid-template-columns: 1.3fr 1fr 1.2fr 1fr; gap: var(--s-7); font-size: 1rem; }
+  .brand { display: grid; gap: var(--s-3); align-content: start; }
+  .logo-wrap { background: var(--c-paper); border-radius: var(--r-sm); padding: 6px 12px; justify-self: start; }
+  .phone { font-family: var(--font-head); font-size: 1.5rem; font-weight: 600; text-decoration: none; }
+  .col-title { font-size: 1.0625rem; margin-bottom: var(--s-3); color: var(--c-sun); }
+  ul { list-style: none; display: grid; gap: 2px; }
+  ul a { display: inline-flex; min-height: 34px; align-items: center; text-decoration: none; color: #fff; }
+  ul a:hover { text-decoration: underline; }
+  .bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--s-3); padding-top: var(--s-5); color: var(--c-muted); font-size: 0.9375rem; }
+  .bottom p + p { margin: 0; }
+  .linklike { background: none; border: 0; padding: 0; min-height: 44px; font: inherit; color: var(--c-pink-deep); text-decoration: underline; cursor: pointer; }
+  .demo { margin-top: var(--s-2); font-size: 0.875rem; color: var(--c-muted); }
+  @media (max-width: 960px) { .cols { grid-template-columns: 1fr 1fr; } .brand { grid-column: 1 / -1; } }
+  @media (max-width: 540px) { .cols { grid-template-columns: 1fr; } }
+</style>

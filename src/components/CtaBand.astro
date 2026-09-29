@@ -1,0 +1,27 @@
+---
+import Icon from './Icon.astro';
+import { contact, whatsappUrl } from '../config/site.config';
+interface Props { title?: string; text?: string }
+const { title = 'בואו נבדוק מה יעבוד אצלכם', text = `${contact.ctaNote} ${contact.responsePromise}.` } = Astro.props;
+---
+<section class="section--tight" aria-labelledby="cta-title">
+  <div class="wrap">
+    <div class="block block--sun shape-circle inner">
+      <div class="txt">
+        <h2 id="cta-title">{title}</h2>
+        <p>{text}</p>
+      </div>
+      <div class="actions">
+        <a class="btn btn--primary" href="/contact/"><Icon name="calendar" /><span>{contact.ctaLabel}</span></a>
+        <a class="btn btn--line" href={whatsappUrl()} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>וואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-6); }
+  .txt { position: relative; z-index: 1; }
+  .txt p { margin-top: var(--s-3); font-size: 1.125rem; max-width: 52ch; }
+  .actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+</style>

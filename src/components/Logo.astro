@@ -1,0 +1,22 @@
+---
+import { site } from '../config/site.config';
+---
+<a class="logo" href="/">
+  <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+    <rect width="40" height="40" rx="12" fill="var(--c-berry)" />
+    <path d="M40 40H22a18 18 0 0 1 18-18z" fill="var(--c-pink)" />
+    <circle cx="14" cy="14" r="6" fill="var(--c-sun)" />
+  </svg>
+  <span class="words">
+    <span class="name">{site.shortName}</span>
+    <span class="trade">{site.trade}</span>
+  </span>
+</a>
+
+<style>
+  .logo { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; color: var(--c-berry); }
+  .mark { width: 40px; height: 40px; flex: none; }
+  .words { display: grid; line-height: 1; }
+  .name { font-family: var(--font-head); font-weight: 700; font-size: 1.625rem; }
+  .trade { font-size: 0.8125rem; font-weight: 700; margin-top: 3px; color: var(--c-muted); }
+</style>

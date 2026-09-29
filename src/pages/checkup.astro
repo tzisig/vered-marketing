@@ -1,0 +1,15 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Checkup from '../components/Checkup.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, checkup, images } from '../config/site.config';
+import { breadcrumbSchema, home } from '../lib/schema';
+
+const crumbs = [home, { label: checkup.title, href: '/checkup/' }];
+---
+<BaseLayout title={`${checkup.title}: 8 שאלות על השיווק שלכם`} description={`${checkup.lead} בדיקה חינמית של ${site.name}.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title={checkup.title} lead={checkup.lead} crumbs={crumbs} image={images.workshop} imageAlt={images.workshopAlt} />
+  <section class="section--tight"><div class="narrow"><Checkup /></div></section>
+  <CtaBand />
+</BaseLayout>

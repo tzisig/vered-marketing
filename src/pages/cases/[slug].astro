@@ -1,0 +1,114 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import Icon from '../../components/Icon.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import { cases, industryBySlug, areaBySlug, serviceBySlug, owner, type CaseStudy, type Service } from '../../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return cases.map((study) => ({ params: { slug: study.slug }, props: { study } }));
+}
+interface Props { study: CaseStudy }
+const { study: c } = Astro.props;
+const ind = industryBySlug(c.industry);
+const area = areaBySlug(c.area);
+const svc = c.services.map(serviceBySlug).filter((x): x is Service => Boolean(x));
+const next = cases[(cases.findIndex((x) => x.slug === c.slug) + 1) % cases.length];
+const crumbs = [home, { label: 'מקרי בוחן', href: '/cases/' }, { label: c.client, href: `/cases/${c.slug}/` }];
+const article = { '@context': 'https://schema.org', '@type': 'Article', headline: c.title, description: c.summary, author: { '@type': 'Person', name: owner.name }, publisher: businessRef, mainEntityOfPage: abs(`/cases/${c.slug}/`) };
+---
+<BaseLayout title={`${c.title} | מקרה בוחן`} description={`${c.client}: ${c.summary} ${c.metrics.map((m) => `${m.label}: ${m.before} ל-${m.after}`).join(', ')}.`} schema={[breadcrumbSchema(crumbs), article]} ogImage={ind?.image}>
+  <section class="top">
+    <div class="wrap bento">
+      <div class="block block--berry shape-circle on-dark head-block">
+        <Breadcrumbs crumbs={crumbs} />
+        <p class="meta">{ind?.navTitle}{area ? `, ${area.name}` : ''}, {c.months} חודשי ליווי</p>
+        <h1>{c.title}</h1>
+        <p class="sum">{c.client}. {c.summary}</p>
+      </div>
+      <div class:list={['block', `block--${c.tone}`, 'shape-quarter', 'big']}>
+        <span class="value">{c.headline.value}</span>
+        <span class="vlabel">{c.headline.label}</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="m-title">
+    <div class="wrap">
+      <h2 id="m-title" class="mb">לפני ואחרי</h2>
+      <ul class="metrics">
+        {c.metrics.map((m, i) => (
+          <li class="block block--white reveal" style={`--i:${i}`}>
+            <span class="ml">{m.label}</span>
+            <span class="row"><span class="before"><small>לפני</small>{m.before}</span><Icon name="arrow" size={22} /><span class="after"><small>אחרי</small>{m.after}</span></span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap two">
+      <div class="block block--white">
+        <h2 class="mb">האתגר</h2>
+        <p>{c.challenge}</p>
+      </div>
+      <div class="block block--sun shape-circle">
+        <h2 class="mb">מה עשינו</h2>
+        <ol class="approach">{c.approach.map((a) => <li>{a}</li>)}</ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="wrap">
+      <figure class="block block--berry shape-quarter on-dark quote">
+        <blockquote><p>{c.quote.text}</p></blockquote>
+        <figcaption><strong>{c.quote.name}</strong>, {c.quote.role}</figcaption>
+      </figure>
+      <p class="used">שירותים בפרויקט: {svc.map((s, i) => <>{i > 0 && ', '}<a href={`/services/${s.slug}/`}>{s.navTitle}</a></>)}{ind && <>. תחום: <a href={`/industries/${ind.slug}/`}>{ind.navTitle}</a></>}.</p>
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="n-title">
+    <div class="wrap">
+      <h2 id="n-title" class="mb">מקרה הבוחן הבא</h2>
+      <div class="next"><CaseCard study={next} /></div>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .top { padding-block: var(--s-6) var(--s-5); }
+  .bento { display: grid; grid-template-columns: 2fr 1fr; gap: var(--block-gap); }
+  .head-block { display: grid; gap: var(--s-3); align-content: center; min-height: 340px; }
+  .head-block > * { position: relative; z-index: 1; }
+  .meta { font-weight: 700; color: var(--c-sun) !important; }
+  .sum { font-size: 1.1875rem; color: var(--c-blush); max-width: 58ch; }
+  .big { display: grid; align-content: end; gap: 4px; }
+  .value { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: clamp(3rem, 2rem + 4vw, 5rem); line-height: 1; }
+  .vlabel { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: 1.375rem; }
+  .mb { margin-bottom: var(--s-5); position: relative; z-index: 1; }
+  .metrics { list-style: none; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--block-gap); }
+  .metrics li { display: grid; gap: var(--s-3); }
+  .ml { font-weight: 700; }
+  .row { display: flex; align-items: center; gap: var(--s-3); flex-wrap: wrap; }
+  .row :global(svg) { color: var(--c-pink-deep); }
+  .before, .after { display: grid; font-family: var(--font-head); font-weight: 700; font-size: 1.75rem; line-height: 1.1; }
+  .before { color: var(--c-muted); }
+  .after { color: var(--c-pink-deep); }
+  small { font-family: var(--font-body); font-size: 0.8125rem; font-weight: 700; color: var(--c-muted); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--block-gap); }
+  .approach { position: relative; z-index: 1; padding-inline-start: 1.3em; display: grid; gap: var(--s-2); }
+  .quote { margin: 0; display: grid; gap: var(--s-4); }
+  .quote > * { position: relative; z-index: 1; }
+  .quote blockquote { margin: 0; font-family: var(--font-head); font-size: clamp(1.375rem, 1.1rem + 1vw, 2rem); line-height: 1.4; color: #fff; }
+  .quote figcaption { color: var(--c-blush); }
+  .used { margin-top: var(--s-5); }
+  .next { max-width: 380px; }
+  @media (max-width: 900px) { .bento, .two, .metrics { grid-template-columns: 1fr; } .head-block { min-height: 0; } }
+</style>

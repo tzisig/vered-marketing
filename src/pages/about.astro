@@ -1,0 +1,52 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { owner, stats, site, images } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'אודות', href: '/about/' }];
+const person = { '@context': 'https://schema.org', '@type': 'Person', name: owner.name, jobTitle: owner.role, worksFor: businessRef, url: abs('/about/'), knowsAbout: ['שיווק דיגיטלי', 'אסטרטגיה שיווקית', 'Google Ads', 'SEO'] };
+---
+<BaseLayout title={`${owner.name}, ${owner.role}`} description={`${owner.name} מלווה עסקים קטנים ובינוניים ב${site.region} מאז ${owner.since}. הסיפור, השיטה והרקע המקצועי.`} schema={[breadcrumbSchema(crumbs), person]} ogImage={owner.deskImage}>
+  <PageHero title={`נעים מאוד, ${owner.name}`} lead={owner.shortBio} crumbs={crumbs} image={owner.image} imageAlt={owner.imageAlt} />
+  <section class="section--tight">
+    <div class="wrap story">
+      <div class="block block--white text">{owner.story.map((p) => <p>{p}</p>)}</div>
+      <div class="media"><Picture src={owner.deskImage} alt={owner.deskImageAlt} widths={[400, 700]} sizes="(min-width: 900px) 35vw, 100vw" formats={['avif', 'webp']} loading="lazy" /></div>
+    </div>
+  </section>
+  <section class="section--tight">
+    <div class="wrap stats">
+      <div class="block block--pink shape-quarter"><span class="v">{stats.years}</span><span class="l">שנות ליווי עסקים</span></div>
+      <div class="block block--cyan shape-circle"><span class="v">{stats.clients}+</span><span class="l">עסקים שליוויתי</span></div>
+      <div class="block block--sun shape-quarter"><span class="v">{stats.retention}%</span><span class="l">נשארים אחרי 3 חודשים</span></div>
+    </div>
+  </section>
+  <section class="section--tight">
+    <div class="wrap two">
+      <div class="block block--berry shape-circle on-dark">
+        <h2 class="mb">רקע מקצועי</h2>
+        <ul class="dots">{owner.credentials.map((c) => <li>{c}</li>)}</ul>
+      </div>
+      <div class="media"><Picture src={images.workshop} alt={images.workshopAlt} widths={[500, 800]} sizes="(min-width: 900px) 45vw, 100vw" formats={['avif', 'webp']} loading="lazy" /></div>
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .story { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--block-gap); }
+  .text p { max-width: 64ch; }
+  .story .media { min-height: 360px; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--block-gap); }
+  .stats .block { display: grid; gap: 4px; min-height: 180px; align-content: end; }
+  .v { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: 3.5rem; line-height: 1; }
+  .l { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: 1.25rem; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: var(--block-gap); }
+  .two .block > * { position: relative; z-index: 1; }
+  .two .media { min-height: 300px; }
+  .mb { margin-bottom: var(--s-5); }
+  @media (max-width: 900px) { .story, .stats, .two { grid-template-columns: 1fr; } .story .media { aspect-ratio: 3 / 4; } }
+</style>

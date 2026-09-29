@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ServiceBlocks from '../../components/ServiceBlocks.astro';
+import CaseCard from '../../components/CaseCard.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { areas, services, cases, type Area } from '../../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../../lib/schema';
+
+export function getStaticPaths() {
+  return areas.map((area) => ({ params: { slug: area.slug }, props: { area } }));
+}
+interface Props { area: Area }
+const { area: a } = Astro.props;
+const areaCases = cases.filter((c) => c.area === a.slug);
+const others = areas.filter((x) => x.slug !== a.slug);
+const crumbs = [home, { label: 'אזורי פעילות', href: '/areas/' }, { label: a.name, href: `/areas/${a.slug}/` }];
+const pageSchema = { '@context': 'https://schema.org', '@type': 'Service', name: `ייעוץ שיווקי ${a.nameIn}`, url: abs(`/areas/${a.slug}/`), provider: businessRef, areaServed: { '@type': 'Place', name: a.name } };
+---
+<BaseLayout title={a.metaTitle} description={a.metaDescription} schema={[breadcrumbSchema(crumbs), pageSchema]} ogImage={a.image}>
+  <PageHero title={`יועצת שיווק ${a.nameIn}`} lead={a.intro} crumbs={crumbs} image={a.image} imageAlt={a.imageAlt} />
+
+  <section class="section--tight">
+    <div class="wrap local">
+      <div class="block block--white text">
+        <h2 class="mb">מה מיוחד בשיווק {a.nameIn}</h2>
+        {a.local.map((p) => <p>{p}</p>)}
+      </div>
+      <aside class="side">
+        <div class="block block--sun shape-circle">
+          <h2 class="h3">עסקים שאני מלווה {a.nameIn}</h2>
+          <ul class="dots">{a.businessTypes.map((b) => <li>{b}</li>)}</ul>
+        </div>
+        <div class="block block--berry on-dark">
+          <h2 class="h3">איפה נפגשים</h2>
+          <p>{a.meeting}</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  {areaCases.length > 0 && (
+    <section class="section--tight" aria-labelledby="c-title">
+      <div class="wrap">
+        <h2 id="c-title" class="mb">מקרה בוחן {a.nameIn}</h2>
+        <div class="cases">{areaCases.map((c) => <CaseCard study={c} />)}</div>
+      </div>
+    </section>
+  )}
+
+  <section class="section--tight" aria-labelledby="svc-title">
+    <div class="wrap">
+      <h2 id="svc-title" class="mb">שירותים לעסקים {a.nameIn}</h2>
+      <ServiceBlocks list={services} />
+    </div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="o-title">
+    <div class="wrap">
+      <h2 id="o-title" class="mb">אזורים נוספים</h2>
+      <ul class="others">{others.map((o) => <li><a href={`/areas/${o.slug}/`}>{o.name}</a></li>)}</ul>
+    </div>
+  </section>
+
+  <CtaBand title={`עסק ${a.nameIn}? בואו נדבר`} />
+</BaseLayout>
+
+<style>
+  .mb { margin-bottom: var(--s-5); }
+  .h3 { font-size: var(--t-h3); margin-bottom: var(--s-3); position: relative; z-index: 1; }
+  .local { display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--block-gap); align-items: start; }
+  .text p { max-width: 68ch; }
+  .side { display: grid; gap: var(--block-gap); }
+  .side ul, .side p { position: relative; z-index: 1; }
+  .cases { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 360px)); gap: var(--block-gap); }
+  .others { list-style: none; display: flex; flex-wrap: wrap; gap: var(--s-3); }
+  .others a { display: inline-flex; align-items: center; min-height: 52px; padding: 0 var(--s-5); border-radius: 999px; background: var(--c-card); border: 2px solid var(--c-blush); color: var(--c-berry); text-decoration: none; font-family: var(--font-head); font-weight: 600; }
+  .others a:hover { border-color: var(--c-pink); }
+  @media (max-width: 900px) { .local { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,25 @@
+---
+import type { Faq } from '../config/site.config';
+interface Props { items: Faq[] }
+const { items } = Astro.props;
+---
+<div class="faq">
+  {items.map((f) => (
+    <details>
+      <summary><span>{f.q}</span></summary>
+      <p>{f.a}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq { display: grid; gap: var(--s-3); }
+  details { background: var(--c-card); border-radius: var(--r-sm); border: 2px solid var(--c-blush); }
+  details[open] { border-color: var(--c-pink); }
+  summary { display: flex; justify-content: space-between; align-items: center; gap: var(--s-4); min-height: 60px; padding: var(--s-3) var(--s-5); cursor: pointer; list-style: none; font-family: var(--font-head); font-weight: 600; font-size: 1.125rem; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: '+'; flex: none; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%; background: var(--c-berry); color: #fff; font-size: 1.25rem; transition: transform 200ms var(--ease); }
+  details[open] summary::after { transform: rotate(45deg); background: var(--c-pink-deep); }
+  details p { padding: 0 var(--s-5) var(--s-5); max-width: 70ch; }
+  @media (prefers-reduced-motion: reduce) { summary::after { transition: none; } }
+</style>

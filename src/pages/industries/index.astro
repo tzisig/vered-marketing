@@ -1,0 +1,37 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, industries, images } from '../../config/site.config';
+import { breadcrumbSchema, home } from '../../lib/schema';
+
+const crumbs = [home, { label: 'תחומים', href: '/industries/' }];
+---
+<BaseLayout title="שיווק לפי תחום: קליניקות, עורכי דין, מסעדות ו-B2B" description={`${site.name} מתמחה בשיווק לקליניקות, משרדי עורכי דין ורואי חשבון, מסעדות וחנויות, וחברות B2B. מה עובד בכל תחום ולמה.`} schema={[breadcrumbSchema(crumbs)]}>
+  <PageHero title="תחומים" lead="כל תחום הוא שוק אחר, עם כללים, לקוחות וערוצים משלו. אלה ארבעת התחומים שבהם ליוויתי הכי הרבה עסקים." crumbs={crumbs} image={images.workshop} imageAlt={images.workshopAlt} />
+  <section class="section">
+    <div class="wrap grid">
+      {industries.map((ind, i) => (
+        <article class="card reveal" style={`--i:${i % 2}`}>
+          <a href={`/industries/${ind.slug}/`}>
+            <div class="media"><Picture src={ind.image} alt={ind.imageAlt} widths={[500, 800]} sizes="(min-width: 900px) 45vw, 100vw" formats={['avif', 'webp']} loading="lazy" /></div>
+            <h2>{ind.title}</h2>
+          </a>
+          <p class="muted">{ind.intro}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-7) var(--block-gap); }
+  .card { display: grid; gap: var(--s-3); align-content: start; }
+  .card a { display: grid; gap: var(--s-4); text-decoration: none; color: var(--c-berry); }
+  .card .media { aspect-ratio: 16 / 10; }
+  .card h2 { font-size: var(--t-h3); }
+  .card a:hover h2 { text-decoration: underline; text-underline-offset: 0.2em; }
+  @media (max-width: 800px) { .grid { grid-template-columns: 1fr; } }
+</style>

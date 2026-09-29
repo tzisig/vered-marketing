@@ -1,0 +1,176 @@
+/*
+  Design system: ui-ux-pro-max "Marketing Agency" product type, "Vibrant & Block-based" style
+  (48px block gaps, large type, 4-6 contrasting block colors, geometric shapes) with the
+  Marketing Agency palette. Fonts: Fredoka (headings) + Arimo (body), both Hebrew-capable and
+  both from the pro-max Google Fonts catalog. Colors come from theme.colors as --c-* variables.
+
+  Contrast rules used everywhere:
+    berry blocks  -> white or blush text, any size
+    pink / cyan   -> white text only at large sizes (24px, or 18.66px bold)
+    sun blocks    -> berry text, any size
+*/
+
+:root {
+  --font-head: 'Fredoka Variable', 'Fredoka', 'Arial Hebrew', Arial, sans-serif;
+  --font-body: 'Arimo Variable', 'Arimo', Arial, sans-serif;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 48px;
+  --s-8: 72px;
+  --s-9: 112px;
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --max: 1240px;
+  --block-gap: clamp(12px, 2vw, 20px);
+  --r-block: 28px;
+  --r-sm: 14px;
+  --mobile-bar: 64px;
+
+  --t-display: clamp(2.5rem, 1.5rem + 4.4vw, 4.75rem);
+  --t-h1: clamp(2.25rem, 1.6rem + 2.8vw, 3.75rem);
+  --t-h2: clamp(1.75rem, 1.35rem + 1.8vw, 2.75rem);
+  --t-h3: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; scroll-padding-top: 100px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--c-berry);
+  background: var(--c-paper);
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: calc(var(--mobile-bar) + env(safe-area-inset-bottom));
+}
+@media (min-width: 900px) { body { padding-bottom: 0; } }
+
+img, svg, picture { display: block; max-width: 100%; }
+img { height: auto; }
+
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-head); font-weight: 650; line-height: 1.1; text-wrap: balance; }
+h1 { font-size: var(--t-h1); }
+h2 { font-size: var(--t-h2); }
+h3 { font-size: var(--t-h3); line-height: 1.25; }
+p { margin: 0; text-wrap: pretty; }
+p + p { margin-top: 0.85em; }
+ul, ol { margin: 0; padding: 0; }
+
+a { color: var(--c-pink-deep); text-underline-offset: 0.2em; text-decoration-thickness: 1.5px; }
+a:hover { text-decoration-thickness: 2.5px; }
+:focus-visible { outline: 3px solid var(--c-cyan-deep); outline-offset: 3px; border-radius: 6px; }
+.on-dark :focus-visible { outline-color: var(--c-sun); }
+
+.skip-link { position: absolute; inset-inline-start: var(--s-4); top: -100px; z-index: 200; padding: var(--s-2) var(--s-4); background: var(--c-berry); color: #fff; border-radius: var(--r-sm); }
+.skip-link:focus { top: var(--s-4); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Layout ---------- */
+
+.wrap { max-width: var(--max); margin-inline: auto; padding-inline: var(--gutter); }
+.narrow { max-width: 820px; margin-inline: auto; padding-inline: var(--gutter); }
+.section { padding-block: clamp(var(--s-8), 7vw, var(--s-9)); }
+.section--tight { padding-block: clamp(var(--s-7), 5vw, var(--s-8)); }
+.section--white { background: var(--c-card); }
+
+.head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: var(--s-4) var(--s-6); margin-bottom: var(--s-7); }
+.head p { margin-top: var(--s-3); color: var(--c-muted); max-width: 56ch; }
+.lead { font-size: 1.1875rem; line-height: 1.65; color: var(--c-muted); max-width: 60ch; }
+.muted { color: var(--c-muted); }
+.small { font-size: 0.9375rem; }
+
+/* ---------- Blocks: the building unit of the style ---------- */
+
+.block { position: relative; overflow: hidden; border-radius: var(--r-block); padding: clamp(var(--s-5), 3.5vw, var(--s-7)); }
+.block--berry { background: var(--c-berry); color: #fff; }
+.block--berry .muted, .block--berry p { color: var(--c-blush); }
+.block--pink { background: var(--c-pink); color: #fff; }
+.block--cyan { background: var(--c-cyan); color: #fff; }
+.block--sun { background: var(--c-sun); color: var(--c-berry); }
+.block--white { background: var(--c-card); color: var(--c-berry); }
+.block--berry a, .block--pink a, .block--cyan a { color: #fff; }
+.block--sun a { color: var(--c-berry); }
+.block a.btn--primary { color: #fff; }
+.block a.btn--line { color: var(--c-berry); }
+.block--berry a.btn--line { color: #fff; }
+
+/* Geometric accents: a circle or a quarter circle in a corner, drawn in a tint of the block */
+.shape-circle::after, .shape-quarter::after {
+  content: ''; position: absolute; pointer-events: none; background: rgb(255 255 255 / 0.14);
+}
+.shape-circle::after { width: 220px; height: 220px; border-radius: 50%; inset-inline-end: -70px; bottom: -80px; }
+.shape-quarter::after { width: 180px; height: 180px; border-start-start-radius: 100%; inset-inline-end: 0; bottom: 0; }
+.block--sun.shape-circle::after, .block--sun.shape-quarter::after { background: rgb(131 24 67 / 0.1); }
+
+/* ---------- Buttons ---------- */
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--s-2);
+  min-height: 52px; padding: 0 var(--s-6); border: 2px solid transparent; border-radius: 999px;
+  font: inherit; font-family: var(--font-head); font-size: 1.0625rem; font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: background-color 200ms var(--ease), color 200ms var(--ease), transform 200ms var(--ease);
+}
+.btn svg { width: 20px; height: 20px; flex: none; }
+.btn:hover { transform: translateY(-2px); }
+@media (prefers-reduced-motion: reduce) { .btn:hover { transform: none; } }
+.btn--primary { background: var(--c-pink-deep); color: #fff; }
+.btn--primary:hover { background: var(--c-berry); }
+.btn--line { border-color: currentColor; color: var(--c-berry); background: transparent; }
+.btn--light { background: #fff; color: var(--c-berry); }
+.btn--wa { background: var(--c-whatsapp); color: #fff; }
+a.btn:hover { text-decoration: none; }
+.block--berry a.btn--light, .block--pink a.btn--light, .block--cyan a.btn--light { color: var(--c-berry); }
+.block--berry a.btn--wa { color: #fff; }
+
+.link-arrow { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-family: var(--font-head); font-weight: 600; }
+
+/* ---------- Media ---------- */
+
+.media { position: relative; overflow: hidden; border-radius: var(--r-block); background: var(--c-blush); }
+.media picture, .media img { width: 100%; height: 100%; }
+.media img { object-fit: cover; }
+
+/* ---------- Lists ---------- */
+
+.dots { list-style: none; display: grid; gap: var(--s-2); }
+.dots li { position: relative; padding-inline-start: 26px; }
+.dots li::before { content: ''; position: absolute; inset-inline-start: 0; top: 0.55em; width: 12px; height: 12px; border-radius: 50%; background: var(--c-pink); }
+.block--berry .dots li::before { background: var(--c-sun); }
+
+.ltr { direction: ltr; unicode-bidi: isolate; display: inline-block; }
+
+/* ---------- Forms ---------- */
+
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 700; font-size: 1rem; }
+.field input, .field select, .field textarea {
+  font: inherit; font-size: 1rem; color: var(--c-berry); background: #fff;
+  border: 2px solid var(--c-blush); border-radius: var(--r-sm); padding: 12px 14px; min-height: 52px; width: 100%;
+}
+.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible { border-color: var(--c-cyan-deep); outline-offset: 1px; }
+.field textarea { min-height: 120px; resize: vertical; }
+.field [aria-invalid='true'] { border-color: var(--c-error); }
+.field .error { color: var(--c-error); font-size: 0.9375rem; font-weight: 700; }
+.field .error:empty { display: none; }
+
+/* ---------- Long text ---------- */
+
+.prose h2 { font-size: var(--t-h3); margin: var(--s-7) 0 var(--s-3); }
+.prose ul { padding-inline-start: 1.25em; display: grid; gap: var(--s-2); margin-block: var(--s-3); }
+.prose p { max-width: 70ch; }
+
+/* ---------- Scroll reveal: pro-max "Stagger List" (scale 0.96, 16px, 60ms stagger, no overshoot) ---------- */
+
+.js .reveal { opacity: 0; transform: translateY(16px) scale(0.96); transition: opacity 420ms var(--ease), transform 420ms var(--ease); transition-delay: calc(var(--i, 0) * 60ms); }
+.js .reveal.is-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .js .reveal { opacity: 1; transform: none; transition: none; } }

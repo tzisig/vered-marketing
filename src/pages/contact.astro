@@ -1,0 +1,43 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { contact, owner, telUrl, whatsappUrl } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef, abs } from '../lib/schema';
+
+const crumbs = [home, { label: 'צור קשר', href: '/contact/' }];
+const cp = { '@context': 'https://schema.org', '@type': 'ContactPage', url: abs('/contact/'), about: businessRef };
+---
+<BaseLayout title="צור קשר ותיאום שיחת היכרות" description={`תיאום שיחת היכרות עם ${owner.name}: ${contact.ctaNote} טלפון, וואטסאפ, מייל או טופס.`} schema={[breadcrumbSchema(crumbs), cp]}>
+  <PageHero title="בואו נדבר" lead={`${contact.ctaNote} ${contact.responsePromise}.`} crumbs={crumbs} image={owner.image} imageAlt={owner.imageAlt} />
+  <section class="section--tight">
+    <div class="wrap grid">
+      <div class="block block--white">
+        <h2 class="mb">השאירו פרטים</h2>
+        <ContactForm defaultTopic="שיחת היכרות" />
+      </div>
+      <aside class="block block--berry shape-circle on-dark info">
+        <h2 class="mb">או ישירות</h2>
+        <a class="btn btn--light" href={telUrl}><Icon name="phone" /><span class="ltr">{contact.phone}</span></a>
+        <a class="btn btn--wa" href={whatsappUrl()} target="_blank" rel="noopener"><Icon name="whatsapp" /><span>וואטסאפ</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+        <p><Icon name="mail" size={18} /> <a href={`mailto:${contact.email}`}>{contact.email}</a></p>
+        <p><Icon name="pin" size={18} /> {contact.office}</p>
+        <h3>שעות</h3>
+        <ul>{contact.hours.map((h) => <li>{h.days}: {h.time}</li>)}</ul>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: var(--block-gap); align-items: start; }
+  .mb { margin-bottom: var(--s-5); font-size: var(--t-h3); position: relative; z-index: 1; }
+  .info { display: grid; gap: var(--s-3); }
+  .info > * { position: relative; z-index: 1; }
+  .info p { display: flex; align-items: center; gap: 8px; }
+  .info .btn { justify-self: start; }
+  .info h3 { margin-top: var(--s-3); color: var(--c-sun); }
+  .info ul { list-style: none; display: grid; gap: 4px; color: var(--c-blush); }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+</style>

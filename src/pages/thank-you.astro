@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import { contact, owner } from '../config/site.config';
+import { home } from '../lib/schema';
+
+const crumbs = [home, { label: 'תודה', href: '/thank-you/' }];
+---
+<BaseLayout title="תודה, קיבלתי" description="הפנייה התקבלה." noindex>
+  <PageHero title="תודה, קיבלתי את הפנייה" lead={`${contact.responsePromise}. בינתיים אפשר להציץ במקרי הבוחן או לעשות את בדיקת הבריאות השיווקית.`} crumbs={crumbs} image={owner.deskImage} imageAlt={owner.deskImageAlt}>
+    <div class="actions">
+      <a class="btn btn--light" href="/cases/">למקרי הבוחן</a>
+      <a class="btn btn--light" href="/checkup/">לבדיקת הבריאות השיווקית</a>
+    </div>
+  </PageHero>
+</BaseLayout>
+
+<style>
+  .actions { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-3); }
+</style>

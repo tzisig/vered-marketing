@@ -1,0 +1,208 @@
+---
+import { Picture } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import Funnel from '../components/Funnel.astro';
+import ServiceBlocks from '../components/ServiceBlocks.astro';
+import CaseCard from '../components/CaseCard.astro';
+import BudgetCalc from '../components/BudgetCalc.astro';
+import FaqList from '../components/FaqList.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, hero, owner, stats, contact, services, cases, industries, areas, principles, processSteps, faqs, checkup } from '../config/site.config';
+import { faqSchema } from '../lib/schema';
+
+const description = `${owner.name}, ${owner.role} לעסקים קטנים ובינוניים ב${site.region}: אסטרטגיה, קמפיינים בגוגל ובמטא, SEO וליווי חודשי. תוכנית ברורה ותוצאות שנמדדות.`;
+const quotes = cases.slice(0, 2);
+---
+<BaseLayout title={`יועצת שיווק לעסקים קטנים ב${site.region}`} description={description} schema={[faqSchema(faqs)]}>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap bento">
+      <div class="block block--berry shape-circle b-main on-dark">
+        <p class="kicker">{owner.name}, {owner.role}</p>
+        <h1 id="hero-title">{hero.title} <span class="em">{hero.titleEm}</span></h1>
+        <p class="lead-on">{hero.lead}</p>
+        <div class="actions">
+          <a class="btn btn--light" href="/contact/"><Icon name="calendar" /><span>{contact.ctaLabel}</span></a>
+          <a class="btn btn--line on" href="/cases/">למקרי הבוחן</a>
+        </div>
+        <p class="note">{contact.ctaNote}</p>
+      </div>
+      <div class="media b-photo">
+        <Picture src={owner.image} alt={owner.imageAlt} widths={[400, 700, 1000]} sizes="(min-width: 1000px) 30vw, 100vw" formats={['avif', 'webp']} loading="eager" fetchpriority="high" />
+      </div>
+      <div class="block block--pink shape-quarter b-stat">
+        <span class="stat-val">פי {stats.leadGrowth}</span>
+        <span class="stat-label">יותר פניות בחודש, בחציון, אחרי חצי שנה</span>
+      </div>
+      <a class="block block--sun shape-circle b-quiz" href="/checkup/">
+        <span class="quiz-kicker">2 דקות, 8 שאלות</span>
+        <span class="quiz-title">{checkup.title}</span>
+        <span class="quiz-go">לבדיקה <Icon name="arrow" size={20} /></span>
+      </a>
+    </div>
+  </section>
+
+  <section class="section--tight" aria-label="שיטת העבודה">
+    <div class="wrap duo">
+      <div class="block block--berry shape-quarter on-dark"><Funnel /></div>
+      <div class="principles">
+        <h2>איך אני עובדת</h2>
+        <ul>
+          {principles.map((p, i) => (
+            <li class="reveal" style={`--i:${i}`}>
+              <h3>{p.title}</h3>
+              <p class="muted">{p.text}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="svc-title">
+    <div class="wrap">
+      <div class="head">
+        <div><h2 id="svc-title">מה אפשר לעשות יחד</h2><p>מפגישת ייעוץ אחת ועד מנהלת שיווק חיצונית. כל שירות מתומחר מראש.</p></div>
+        <a class="link-arrow" href="/services/">כל השירותים <Icon name="arrow" size={18} /></a>
+      </div>
+      <ServiceBlocks list={services} />
+    </div>
+  </section>
+
+  <section class="section section--white" aria-labelledby="cases-title">
+    <div class="wrap">
+      <div class="head">
+        <div><h2 id="cases-title">תוצאות, במספרים</h2><p>ארבעה עסקים, ארבעה תחומים, ומה השתנה אצלם (נתוני דמו).</p></div>
+        <a class="link-arrow" href="/cases/">כל מקרי הבוחן <Icon name="arrow" size={18} /></a>
+      </div>
+      <div class="cases">{cases.map((c) => <div class="reveal"><CaseCard study={c} /></div>)}</div>
+      <div class="quotes">
+        {quotes.map((c) => (
+          <figure class="quote">
+            <blockquote><p>{c.quote.text}</p></blockquote>
+            <figcaption><strong>{c.quote.name}</strong>, {c.quote.role}, {c.client}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-label="מחשבון תקציב">
+    <div class="wrap"><BudgetCalc /></div>
+  </section>
+
+  <section class="section--tight" aria-labelledby="steps-title">
+    <div class="wrap">
+      <h2 id="steps-title" class="mb">מהשיחה הראשונה לתוצאות</h2>
+      <ol class="steps">
+        {processSteps.map((s, i) => (
+          <li class={`block block--${['white', 'white', 'white', 'cyan'][i]} reveal`} style={`--i:${i}`}>
+            <span class="num">{i + 1}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="ind-title">
+    <div class="wrap">
+      <div class="head">
+        <div><h2 id="ind-title">תחומים שאני מכירה מקרוב</h2><p>כל תחום עם הבעיות, הכללים והערוצים שעובדים בו.</p></div>
+        <a class="link-arrow" href="/industries/">כל התחומים <Icon name="arrow" size={18} /></a>
+      </div>
+      <ul class="inds">
+        {industries.map((ind, i) => (
+          <li class="reveal" style={`--i:${i}`}>
+            <a href={`/industries/${ind.slug}/`}>
+              <div class="media"><Picture src={ind.image} alt={ind.imageAlt} widths={[400, 700]} sizes="(min-width: 1000px) 25vw, 50vw" formats={['avif', 'webp']} loading="lazy" /></div>
+              <h3>{ind.navTitle}</h3>
+            </a>
+          </li>
+        ))}
+      </ul>
+      <p class="areas-line">פעילה ב{areas.map((a, i) => <>{i > 0 && (i === areas.length - 1 ? ' וב' : ', ב')}<a href={`/areas/${a.slug}/`}>{a.name}</a></>)}, ובזום בכל הארץ.</p>
+    </div>
+  </section>
+
+  <section class="section section--white" aria-labelledby="faq-title">
+    <div class="narrow">
+      <h2 id="faq-title" class="mb">שאלות נפוצות</h2>
+      <FaqList items={faqs} />
+      <p class="more"><a href="/faq/">עוד שאלות</a></p>
+    </div>
+  </section>
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .hero { padding-block: var(--s-6) var(--s-5); }
+  .bento { display: grid; grid-template-columns: 1.25fr 1.25fr 0.9fr 0.9fr; grid-template-rows: auto auto; gap: var(--block-gap); }
+  .b-main { grid-column: 1 / 3; grid-row: 1 / 3; display: grid; align-content: center; gap: var(--s-4); min-height: 520px; }
+  .b-main > * { position: relative; z-index: 1; }
+  .kicker { font-weight: 700; color: var(--c-sun) !important; }
+  h1 { font-size: var(--t-display); font-weight: 700; line-height: 1.02; }
+  .em { display: block; color: var(--c-sun); }
+  .lead-on { font-size: 1.1875rem; line-height: 1.6; color: var(--c-blush); max-width: 48ch; }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-2); }
+  .btn--line.on { color: #fff; border-color: rgb(255 255 255 / 0.7); }
+  .note { font-size: 0.9375rem; }
+  .b-photo { grid-column: 3 / 5; grid-row: 1; min-height: 250px; }
+  .b-stat { grid-column: 3; grid-row: 2; display: grid; align-content: end; gap: 6px; min-height: 250px; }
+  .stat-val { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: 3.25rem; line-height: 1; }
+  .stat-label { position: relative; z-index: 1; font-family: var(--font-head); font-weight: 700; font-size: 1.1875rem; line-height: 1.3; }
+  .b-quiz { grid-column: 4; grid-row: 2; display: grid; align-content: space-between; gap: var(--s-3); text-decoration: none; transition: transform 200ms var(--ease); }
+  .b-quiz:hover { transform: translateY(-4px); }
+  .b-quiz > * { position: relative; z-index: 1; }
+  .quiz-kicker { font-weight: 700; font-size: 0.9375rem; }
+  .quiz-title { font-family: var(--font-head); font-weight: 700; font-size: 1.625rem; line-height: 1.15; }
+  .quiz-go { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; text-decoration: underline; }
+
+  .duo { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--s-7); align-items: center; }
+  .principles h2 { margin-bottom: var(--s-5); }
+  .principles ul { list-style: none; display: grid; gap: var(--s-5); }
+  .principles li { padding-inline-start: var(--s-5); border-inline-start: 6px solid var(--c-pink); }
+  .principles h3 { margin-bottom: 4px; }
+
+  .cases { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--block-gap); }
+  .cases :global(.case a) { background: var(--c-paper); }
+  .quotes { display: grid; grid-template-columns: 1fr 1fr; gap: var(--block-gap); margin-top: var(--s-7); }
+  .quote { margin: 0; padding: var(--s-6); border-radius: var(--r-block); background: var(--c-paper); display: grid; gap: var(--s-4); }
+  .quote blockquote { margin: 0; font-family: var(--font-head); font-size: 1.375rem; font-weight: 500; line-height: 1.45; }
+  .quote blockquote p::before { content: '"'; color: var(--c-pink-deep); }
+  .quote blockquote p::after { content: '"'; color: var(--c-pink-deep); }
+  .quote figcaption { font-size: 0.9375rem; color: var(--c-muted); }
+
+  .mb { margin-bottom: var(--s-6); }
+  .steps { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--block-gap); }
+  .steps li { display: grid; align-content: start; gap: var(--s-3); }
+  .num { font-family: var(--font-head); font-weight: 700; font-size: 2.5rem; line-height: 1; color: var(--c-pink-deep); }
+  .steps .block--cyan .num { color: #fff; }
+  .steps .block--cyan p { color: #fff; font-size: 1.1875rem; font-weight: 700; }
+  .steps .block--white p { color: var(--c-muted); }
+
+  .inds { list-style: none; display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--block-gap); }
+  .inds a { display: grid; gap: var(--s-3); text-decoration: none; color: var(--c-berry); }
+  .inds .media { aspect-ratio: 4 / 5; }
+  .inds h3 { font-size: 1.25rem; }
+  .inds a:hover h3 { text-decoration: underline; text-underline-offset: 0.2em; }
+  .areas-line { margin-top: var(--s-6); font-size: 1.0625rem; }
+  .more { margin-top: var(--s-5); font-weight: 700; }
+
+  @media (max-width: 1000px) {
+    .bento { grid-template-columns: 1fr 1fr; }
+    .b-main { grid-column: 1 / -1; grid-row: auto; min-height: 0; }
+    .b-photo { grid-column: 1 / -1; grid-row: auto; aspect-ratio: 16 / 9; min-height: 0; }
+    .b-stat, .b-quiz { grid-column: auto; grid-row: auto; min-height: 200px; }
+    .duo { grid-template-columns: 1fr; }
+    .cases, .steps, .inds { grid-template-columns: 1fr 1fr; }
+    .quotes { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 560px) {
+    .bento, .cases, .steps { grid-template-columns: 1fr; }
+    .stat-val { font-size: 2.75rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .b-quiz:hover { transform: none; } }
+</style>

@@ -1,0 +1,60 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
+import CtaBand from '../components/CtaBand.astro';
+import { site, packages, pricingNotes, services, formatDate, owner } from '../config/site.config';
+import { breadcrumbSchema, home, businessRef } from '../lib/schema';
+
+const crumbs = [home, { label: 'מחירים', href: '/pricing/' }];
+const offers = { '@context': 'https://schema.org', '@type': 'OfferCatalog', name: 'חבילות ייעוץ שיווקי', provider: businessRef, itemListElement: packages.map((p) => ({ '@type': 'Offer', name: p.name, description: p.text, priceCurrency: 'ILS', price: p.price.replace(/[^\d]/g, '') })) };
+---
+<BaseLayout title="מחירים: ייעוץ שיווקי, תוכנית שיווק וליווי חודשי" description={`המחירים של ${site.name}: פגישת ייעוץ, תוכנית שיווק מלאה וליווי חודשי. מחיר ידוע מראש, בלי אותיות קטנות.`} schema={[breadcrumbSchema(crumbs), offers]}>
+  <PageHero title="מחירים" lead="שלוש דרכים לעבוד יחד, מחיר ידוע מראש. אם לא בטוחים מה מתאים, שיחת ההיכרות בלי עלות." crumbs={crumbs} image={owner.deskImage} imageAlt={owner.deskImageAlt} />
+  <section class="section--tight">
+    <div class="wrap grid">
+      {packages.map((p, i) => (
+        <article class:list={['block', p.featured ? 'block--berry shape-circle on-dark' : 'block--white', 'pkg', 'reveal']} style={`--i:${i}`}>
+          {p.featured && <p class="badge">הכי נפוץ</p>}
+          <h2>{p.name}</h2>
+          <p class="price"><strong>{p.price}</strong> <span>{p.unit}</span></p>
+          <p class="txt">{p.text}</p>
+          <ul class="dots">{p.includes.map((x) => <li>{x}</li>)}</ul>
+          <a class={`btn ${p.featured ? 'btn--light' : 'btn--primary'}`} href="/contact/"><Icon name="calendar" /><span>לתיאום שיחה</span></a>
+        </article>
+      ))}
+    </div>
+  </section>
+  <section class="section--tight" aria-labelledby="svc-title">
+    <div class="wrap">
+      <div class="block block--white">
+        <h2 id="svc-title" class="mb">מחיר לכל שירות</h2>
+        <table>
+          <caption class="visually-hidden">מחירים לפי שירות</caption>
+          <thead><tr><th scope="col">שירות</th><th scope="col">מחיר</th><th scope="col">משך</th></tr></thead>
+          <tbody>{services.map((s) => <tr><th scope="row"><a href={`/services/${s.slug}/`}>{s.title}</a></th><td>{s.price}</td><td>{s.duration}</td></tr>)}</tbody>
+        </table>
+        <ul class="notes">{pricingNotes.map((n) => <li>{n}</li>)}</ul>
+        <p class="small muted">המחירים עודכנו ב-{formatDate(site.contentUpdated)}.</p>
+      </div>
+    </div>
+  </section>
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--block-gap); align-items: stretch; }
+  .pkg { display: grid; align-content: start; gap: var(--s-4); }
+  .pkg > * { position: relative; z-index: 1; }
+  .badge { justify-self: start; background: var(--c-sun); color: var(--c-berry) !important; font-weight: 700; padding: 4px 14px; border-radius: 999px; font-size: 0.9375rem; }
+  .price strong { font-family: var(--font-head); font-size: 2.5rem; font-weight: 700; }
+  .price span { font-size: 0.9375rem; }
+  .block--white .price span, .block--white .txt { color: var(--c-muted); }
+  .pkg .btn { justify-self: start; margin-top: auto; }
+  .mb { margin-bottom: var(--s-5); }
+  table { width: 100%; border-collapse: collapse; font-size: 1rem; }
+  th, td { text-align: start; padding: var(--s-3); border-bottom: 2px solid var(--c-blush); vertical-align: top; }
+  thead th { font-family: var(--font-head); }
+  .notes { margin-block: var(--s-5) var(--s-3); padding-inline-start: 1.2em; display: grid; gap: var(--s-2); }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } table { display: block; overflow-x: auto; } }
+</style>

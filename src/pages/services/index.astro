@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import ServiceBlocks from '../../components/ServiceBlocks.astro';
+import CtaBand from '../../components/CtaBand.astro';
+import { site, services, images } from '../../config/site.config';
+import { breadcrumbSchema, home, abs } from '../../lib/schema';
+
+const crumbs = [home, { label: 'שירותים', href: '/services/' }];
+const list = { '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: services.map((s, i) => ({ '@type': 'ListItem', position: i + 1, name: s.title, url: abs(`/services/${s.slug}/`) })) };
+---
+<BaseLayout title="שירותי ייעוץ שיווקי לעסקים קטנים" description={`כל השירותים של ${site.name}: אסטרטגיה, קמפיינים ממומנים, מיתוג ומסרים, SEO ותוכן, מנהלת שיווק חיצונית וסדנאות. מחיר ידוע מראש לכל שירות.`} schema={[breadcrumbSchema(crumbs), list]}>
+  <PageHero title="שירותים" lead="כל שירות מתומחר מראש, עם תוצרים ברורים ולוח זמנים. לא בטוחים מה מתאים? שיחת ההיכרות בדיוק בשביל זה." crumbs={crumbs} image={images.segmentation} imageAlt={images.segmentationAlt} />
+  <section class="section">
+    <div class="wrap"><ServiceBlocks list={services} headingLevel="h2" /></div>
+  </section>
+  <CtaBand />
+</BaseLayout>

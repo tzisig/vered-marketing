@@ -1,0 +1,104 @@
+---
+// Marketing budget calculator: customer value x close rate x goal -> leads needed and a budget range.
+// Channel cost-per-lead ranges come from the config.
+import Icon from './Icon.astro';
+import { budgetTool, whatsappUrl } from '../config/site.config';
+interface Props { id?: string; headingLevel?: 'h2' | 'h3' }
+const { id = 'budget', headingLevel = 'h2' } = Astro.props;
+const H = headingLevel;
+const d = budgetTool.defaults;
+const ch = budgetTool.channels[0];
+const leads = Math.ceil(d.customersGoal / (d.closeRate / 100));
+const fmt = (n: number) => Math.round(n).toLocaleString('he-IL');
+const round100 = (n: number) => Math.round(n / 100) * 100;
+const initial = {
+  leads,
+  budget: `${fmt(round100(leads * ch.cpl.min))}-${fmt(round100(leads * ch.cpl.max))} ₪`,
+  revenue: `${fmt(d.customersGoal * d.customerValue)} ₪`,
+};
+---
+<section class="calc" aria-labelledby={`${id}-title`} data-budget data-channels={JSON.stringify(budgetTool.channels)} data-wa={whatsappUrl('')}>
+  <div class="intro">
+    <H id={`${id}-title`}>{budgetTool.title}</H>
+    <p class="muted">{budgetTool.lead}</p>
+  </div>
+  <div class="inputs">
+    <div class="field">
+      <label for={`${id}-value`}>כמה שווה לכם לקוח חדש? (רווח, ₪)</label>
+      <input id={`${id}-value`} type="number" inputmode="numeric" min="50" step="50" value={d.customerValue} data-b-value />
+    </div>
+    <div class="field">
+      <label for={`${id}-rate`}>מכל 100 פניות, כמה הופכות ללקוחות?</label>
+      <input id={`${id}-rate`} type="number" inputmode="numeric" min="1" max="100" value={d.closeRate} data-b-rate />
+    </div>
+    <div class="field">
+      <label for={`${id}-goal`}>כמה לקוחות חדשים בחודש תרצו?</label>
+      <input id={`${id}-goal`} type="number" inputmode="numeric" min="1" value={d.customersGoal} data-b-goal />
+    </div>
+    <div class="field">
+      <label for={`${id}-channel`}>ערוץ עיקרי</label>
+      <select id={`${id}-channel`} data-b-channel>
+        {budgetTool.channels.map((c) => <option value={c.id}>{c.label}</option>)}
+      </select>
+    </div>
+  </div>
+  <div class="out block block--berry" aria-live="polite">
+    <div class="res"><span class="rl">פניות שצריך בחודש</span><strong data-b-leads>{initial.leads}</strong></div>
+    <div class="res"><span class="rl">תקציב פרסום משוער לחודש</span><strong data-b-budget>{initial.budget}</strong></div>
+    <div class="res"><span class="rl">רווח מהלקוחות החדשים</span><strong data-b-revenue>{initial.revenue}</strong></div>
+    <p class="verdict" data-b-verdict></p>
+    <a class="btn btn--light" href={whatsappUrl()} target="_blank" rel="noopener" data-b-wa><Icon name="whatsapp" /><span>לשלוח את המספרים לנועה</span><span class="visually-hidden">(נפתח בחלון חדש)</span></a>
+  </div>
+  <p class="note small muted">{budgetTool.note}</p>
+</section>
+
+<style>
+  .calc { background: var(--c-card); border-radius: var(--r-block); padding: clamp(var(--s-5), 4vw, var(--s-7)); display: grid; gap: var(--s-5); }
+  .intro p { margin-top: var(--s-2); }
+  .inputs { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s-4); }
+  .out { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s-4); }
+  .res { position: relative; z-index: 1; display: grid; gap: 4px; }
+  .rl { font-size: 0.9375rem; color: var(--c-blush); }
+  .res strong { font-family: var(--font-head); font-weight: 700; font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem); color: var(--c-sun); line-height: 1.1; }
+  .verdict { grid-column: 1 / -1; position: relative; z-index: 1; font-weight: 700; color: #fff !important; }
+  .verdict:empty { display: none; }
+  .out .btn { grid-column: 1 / -1; justify-self: start; position: relative; z-index: 1; }
+  @media (max-width: 720px) { .inputs, .out { grid-template-columns: 1fr; } }
+</style>
+
+<script>
+  type Ch = { id: string; label: string; cpl: { min: number; max: number } };
+  const fmt = (n: number) => Math.round(n).toLocaleString('he-IL');
+  const r100 = (n: number) => Math.round(n / 100) * 100;
+  document.querySelectorAll<HTMLElement>('[data-budget]').forEach((root) => {
+    const channels: Ch[] = JSON.parse(root.dataset.channels || '[]');
+    const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const value = q<HTMLInputElement>('[data-b-value]');
+    const rate = q<HTMLInputElement>('[data-b-rate]');
+    const goal = q<HTMLInputElement>('[data-b-goal]');
+    const channel = q<HTMLSelectElement>('[data-b-channel]');
+    const out = { leads: q('[data-b-leads]'), budget: q('[data-b-budget]'), revenue: q('[data-b-revenue]'), verdict: q('[data-b-verdict]') };
+    const wa = q<HTMLAnchorElement>('[data-b-wa]');
+    const update = () => {
+      const v = Math.max(0, +value.value || 0);
+      const r = Math.min(100, Math.max(1, +rate.value || 1));
+      const g = Math.max(1, +goal.value || 1);
+      const c = channels.find((x) => x.id === channel.value) || channels[0];
+      const leads = Math.ceil(g / (r / 100));
+      const min = r100(leads * c.cpl.min), max = r100(leads * c.cpl.max);
+      const revenue = g * v;
+      out.leads.textContent = fmt(leads);
+      out.budget.textContent = `${fmt(min)}-${fmt(max)} ₪`;
+      out.revenue.textContent = `${fmt(revenue)} ₪`;
+      out.verdict.textContent = revenue >= max
+        ? 'גם בתרחיש היקר, הרווח מהלקוחות מכסה את הפרסום. שווה לבדוק את זה ברצינות.'
+        : revenue >= min
+          ? 'זה תלוי ביצוע: בתרחיש הטוב זה משתלם, בתרחיש היקר לא. מדידה נכונה תעשה את ההבדל.'
+          : 'בערוץ הזה, במספרים האלה, הפרסום עולה יותר ממה שהוא מחזיר. כדאי לחשוב על ערוץ אחר או על העלאת ערך הלקוח.';
+      const text = `היי נועה, עשיתי את המחשבון: לקוח שווה ${fmt(v)} ₪, ${r}% סגירה, יעד ${g} לקוחות בחודש, ערוץ ${c.label}. יצא ${fmt(leads)} פניות ותקציב של ${fmt(min)}-${fmt(max)} ₪. אשמח לדבר.`;
+      wa.href = (root.dataset.wa || '') + encodeURIComponent(text);
+    };
+    [value, rate, goal, channel].forEach((el) => el.addEventListener('input', update));
+    update();
+  });
+</script>

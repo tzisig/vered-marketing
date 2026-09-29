@@ -1,0 +1,99 @@
+---
+// Marketing checkup: eight yes/no questions -> a score, a level and the first three fixes.
+// Works as a plain list of questions without JavaScript.
+import { checkup, services } from '../config/site.config';
+const serviceNames = Object.fromEntries(services.map((s) => [s.slug, s.navTitle]));
+const model = { questions: checkup.questions, levels: checkup.levels, serviceNames };
+---
+<section class="checkup" data-checkup data-model={JSON.stringify(model)} aria-label={checkup.title}>
+  <form class="qs" data-ck-form>
+    {checkup.questions.map((q, i) => (
+      <fieldset class="q">
+        <legend><span class="n">{i + 1}</span>{q.q}</legend>
+        <div class="opts">
+          <label><input type="radio" name={`q${i}`} value="yes" /><span>כן</span></label>
+          <label><input type="radio" name={`q${i}`} value="no" /><span>לא</span></label>
+        </div>
+      </fieldset>
+    ))}
+    <button class="btn btn--primary" type="submit">לתוצאה שלי</button>
+    <p class="status small muted" data-ck-status aria-live="polite"></p>
+  </form>
+  <div class="result block block--berry shape-circle" hidden data-ck-result tabindex="-1">
+    <p class="score"><strong data-ck-score></strong> מתוך {checkup.questions.length}</p>
+    <h2 data-ck-level></h2>
+    <p data-ck-text></p>
+    <h3>שלושת הצעדים הראשונים שלכם</h3>
+    <ol data-ck-fixes></ol>
+    <div class="actions">
+      <a class="btn btn--light" href="/contact/">לתאם שיחה על התוצאה</a>
+      <button class="btn btn--line again" type="button" data-ck-again>לענות מחדש</button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .checkup { display: grid; gap: var(--s-6); }
+  .qs { display: grid; gap: var(--s-3); }
+  .q { border: 0; margin: 0; padding: var(--s-4) var(--s-5); background: var(--c-card); border-radius: var(--r-sm); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s-3); }
+  legend { float: inline-start; display: flex; align-items: center; gap: var(--s-3); font-weight: 700; padding: 0; max-width: 60ch; }
+  .n { flex: none; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: var(--c-blush); font-family: var(--font-head); }
+  .opts { display: flex; gap: var(--s-2); }
+  .opts label { position: relative; cursor: pointer; }
+  .opts input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .opts span { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; min-height: 46px; border: 2px solid var(--c-blush); border-radius: 999px; font-weight: 700; }
+  .opts input:checked + span { background: var(--c-berry); border-color: var(--c-berry); color: #fff; }
+  .opts input:focus-visible + span { outline: 3px solid var(--c-cyan-deep); outline-offset: 2px; }
+  .qs .btn { justify-self: start; margin-top: var(--s-3); }
+  .result { display: grid; gap: var(--s-3); }
+  .result > * { position: relative; z-index: 1; }
+  .score { font-size: 1.125rem; }
+  .score strong { font-family: var(--font-head); font-size: 3rem; color: var(--c-sun); }
+  .result h3 { margin-top: var(--s-4); color: var(--c-sun); }
+  .result ol { padding-inline-start: 1.3em; display: grid; gap: var(--s-2); color: var(--c-blush); }
+  .actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-3); }
+  .again { color: #fff; }
+</style>
+
+<script>
+  type M = { questions: { q: string; fix: string; service: string }[]; levels: { min: number; title: string; text: string }[]; serviceNames: Record<string, string> };
+  document.querySelectorAll<HTMLElement>('[data-checkup]').forEach((root) => {
+    const m: M = JSON.parse(root.dataset.model || '{}');
+    const formEl = root.querySelector<HTMLFormElement>('[data-ck-form]')!;
+    const result = root.querySelector<HTMLElement>('[data-ck-result]')!;
+    const status = root.querySelector<HTMLElement>('[data-ck-status]')!;
+    formEl.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const answers = m.questions.map((_, i) => (formEl.elements.namedItem(`q${i}`) as RadioNodeList).value);
+      const missing = answers.findIndex((a) => !a);
+      if (missing >= 0) {
+        status.textContent = `חסרה תשובה לשאלה ${missing + 1}.`;
+        formEl.querySelector<HTMLInputElement>(`input[name="q${missing}"]`)?.focus();
+        return;
+      }
+      status.textContent = '';
+      const score = answers.filter((a) => a === 'yes').length;
+      const level = m.levels.find((l) => score >= l.min) || m.levels[m.levels.length - 1];
+      const fixes = m.questions.filter((_, i) => answers[i] === 'no').slice(0, 3);
+      root.querySelector('[data-ck-score]')!.textContent = String(score);
+      root.querySelector('[data-ck-level]')!.textContent = level.title;
+      root.querySelector('[data-ck-text]')!.textContent = level.text;
+      const list = root.querySelector('[data-ck-fixes]')!;
+      list.innerHTML = '';
+      (fixes.length ? fixes : [{ fix: 'הבסיס מסודר. הצעד הבא: להגדיל תקציב בערוץ שמביא את הלקוחות הכי רווחיים, ולמדוד כל שבוע.', service: 'paid-campaigns', q: '' }]).forEach((f) => {
+        const li = document.createElement('li');
+        li.textContent = `${f.fix} (${m.serviceNames[f.service] ?? ''})`;
+        list.appendChild(li);
+      });
+      formEl.hidden = true;
+      result.hidden = false;
+      result.focus();
+    });
+    root.querySelector('[data-ck-again]')!.addEventListener('click', () => {
+      formEl.reset();
+      result.hidden = true;
+      formEl.hidden = false;
+      formEl.querySelector<HTMLInputElement>('input')?.focus();
+    });
+  });
+</script>

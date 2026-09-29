@@ -1,0 +1,37 @@
+---
+// Top of inner pages: a berry title block next to an optional photo block, bento style.
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Breadcrumbs from './Breadcrumbs.astro';
+import type { Crumb } from '../lib/schema';
+
+interface Props { title: string; lead?: string; crumbs: Crumb[]; image?: ImageMetadata; imageAlt?: string }
+const { title, lead, crumbs, image, imageAlt = '' } = Astro.props;
+---
+<section class="page-hero">
+  <div class:list={['wrap', 'grid', { 'has-img': image }]}>
+    <div class="block block--berry shape-circle on-dark text">
+      <Breadcrumbs crumbs={crumbs} />
+      <h1>{title}</h1>
+      {lead && <p class="lead-on">{lead}</p>}
+      <slot />
+    </div>
+    {image && (
+      <div class="media">
+        <Picture src={image} alt={imageAlt} widths={[480, 800, 1100]} sizes="(min-width: 900px) 40vw, 100vw" formats={['avif', 'webp']} loading="eager" fetchpriority="high" />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-hero { padding-block: var(--s-6) var(--s-5); }
+  .grid { display: grid; gap: var(--block-gap); }
+  .has-img { grid-template-columns: 1.3fr 1fr; }
+  .text { display: grid; align-content: center; gap: var(--s-4); min-height: 340px; }
+  .lead-on { font-size: 1.1875rem; line-height: 1.65; color: var(--c-blush); max-width: 60ch; position: relative; z-index: 1; }
+  .text :global(.crumbs) { position: relative; z-index: 1; }
+  h1 { position: relative; z-index: 1; }
+  .media { min-height: 300px; }
+  @media (max-width: 900px) { .has-img { grid-template-columns: 1fr; } .media { aspect-ratio: 16 / 9; min-height: 0; } .text { min-height: 0; } }
+</style>
